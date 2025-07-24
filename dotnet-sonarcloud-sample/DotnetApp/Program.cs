@@ -2,13 +2,12 @@ using System;
 
 namespace DotnetApp
 {
-    public class Program
+    class Program
     {
-        public static void Main(string[] args)
+        static void Main(string[] args)
         {
-            Console.WriteLine(Add(2, 3));
+            Console.WriteLine("Hello from SonarCloud-enabled .NET app!");
         }
-
-        public static int Add(int a, int b) => a + b;
     }
 }
+
