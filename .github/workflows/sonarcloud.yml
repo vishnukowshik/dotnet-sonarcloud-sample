@@ -1,32 +1,36 @@
+# Sets the name of the workflow in GitHub Actions 
 name: SonarCloud Analysis (.NET)
 
+# This tells GitHub that the workflow can be manually triggered from the "Actions" tab via the Run workflow button
 on:
   workflow_dispatch:
 
 jobs:
   build:
+    #This defines a job named "Build and Analyze" that runs on the latest Ubuntu Linux runner
     name: Build and Analyze
     runs-on: ubuntu-latest
 
     steps:
+    #Pulls your repo code into the runner so it can be built, tested, and scanned
       - name: Checkout code
         uses: actions/checkout@v4
-
+#Installs the .NET 8 SDK
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-
+#Restore the .NET 8 SDK Downloads NuGet packages required by your solution (DotnetApp.sln)
       - name: Install dependencies
         run: dotnet restore DotnetApp.sln
-
+# Build the project 
       - name: Build solution
         run: dotnet build DotnetApp.sln --no-restore --configuration Release
 
       - name: Run tests with coverage
         run: |
           dotnet test DotnetApp.Tests/DotnetApp.Tests.csproj --collect:"XPlat Code Coverage"
-
+#Run SonarCloud Analysis
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
