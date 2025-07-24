@@ -9,6 +9,7 @@ namespace DotnetApp
             Console.WriteLine(Add(2, 3));
             Console.WriteLine(AddAgain(4, 5));
             Console.WriteLine(AddDuplicate(6, 7));
+            some error 
         }
 
         public static int Add(int a, int b)
