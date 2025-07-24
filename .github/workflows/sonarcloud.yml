@@ -39,7 +39,6 @@ jobs:
 
 # Connect to sonarcloud using the project key ,org and using sonar token which is for auththorixation
   sonarcloud:
-    build:
     name: Build and Analyze
     runs-on: ubuntu-latest
 
