@@ -1,4 +1,4 @@
-# Sets the name of the workflow in GitHub Actions 
+
 name: SonarCloud Analysis (.NET)
 
 # This tells GitHub that the workflow can be manually triggered from the "Actions" tab via the Run workflow button
