@@ -1,10 +1,14 @@
-namespace DotnetApp.Tests;
+using Xunit;
+using DotnetApp;
 
-public class UnitTest1
+namespace DotnetApp.Tests
 {
-    [Fact]
-    public void Test1()
+    public class UnitTest1
     {
-
+        [Fact]
+        public void TestAdd()
+        {
+            Assert.Equal(5, Program.Add(2, 3));
+        }
     }
 }
