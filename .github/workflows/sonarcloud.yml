@@ -1,0 +1,38 @@
+name: SonarCloud Analysis (.NET)
+
+on:
+  workflow_dispatch:  # Triggered manually from GitHub Actions tab
+
+jobs:
+  build:
+    name: Build and Analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore DotnetApp.sln
+
+      - name: Build solution
+        run: dotnet build DotnetApp.sln --no-restore --configuration Release
+
+      - name: Run tests with coverage
+        run: |
+         dotnet test DotnetApp.Tests/DotnetApp.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=vishnukowshik
+            -Dsonar.organization=vishnukowshik
+            -Dsonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
