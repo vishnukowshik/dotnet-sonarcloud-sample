@@ -1,35 +1,32 @@
 name: SonarCloud Analysis (.NET)
 
-# This tells GitHub that the workflow can be manually triggered from the "Actions" tab via the Run workflow button
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Triggered manually from GitHub Actions tab
 
 jobs:
   build:
-    #This defines a job named "Build and Analyze" that runs on the latest Ubuntu Linux runner
     name: Build and Analyze
     runs-on: ubuntu-latest
 
     steps:
-      #Pulls your repo code into the runner so it can be built, tested, and scanned
       - name: Checkout code
         uses: actions/checkout@v4
-      #Installs the .NET 8 SDK
+
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
-      #Restore the .NET 8 SDK Downloads NuGet packages required by your solution (DotnetApp.sln)
-      - name: Install dependencies
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
         run: dotnet restore DotnetApp.sln
-      # Build the project
+
       - name: Build solution
         run: dotnet build DotnetApp.sln --no-restore --configuration Release
 
       - name: Run tests with coverage
         run: |
-          dotnet test DotnetApp.Tests/DotnetApp.Tests.csproj --collect:"XPlat Code Coverage"
-      #Run SonarCloud Analysis
+          dotnet test DotnetApp.Tests/DotnetApp.Tests.csproj --no-build --collect:"XPlat Code Coverage"
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
@@ -40,10 +37,39 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      #quality gate analysis
-      - name: SonarCloud Quality Gate Check
-        uses: SonarSource/sonarcloud-quality-gate-action@master
-        timeout-minutes: 5
-
+      - name: Wait for Quality Gate result
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          echo "Waiting for SonarCloud Quality Gate..."
+
+          projectKey="vishnukowshik"
+
+          # Get the latest analysis task ID
+          analysisId=$(curl -s -u $SONAR_TOKEN: https://sonarcloud.io/api/ce/component?component=$projectKey | jq -r '.queue[0].id')
+
+          # Wait until the analysis is complete
+          for i in {1..10}; do
+            sleep 10
+            status=$(curl -s -u $SONAR_TOKEN: https://sonarcloud.io/api/ce/task?id=$analysisId | jq -r '.task.status')
+            echo "Check $i: Analysis status = $status"
+            if [[ "$status" == "SUCCESS" ]]; then
+              break
+            fi
+          done
+
+          if [[ "$status" != "SUCCESS" ]]; then
+            echo "SonarCloud analysis did not complete successfully."
+            exit 1
+          fi
+
+          # Check Quality Gate status
+          qualityGateStatus=$(curl -s -u $SONAR_TOKEN: https://sonarcloud.io/api/qualitygates/project_status?analysisId=$analysisId | jq -r '.projectStatus.status')
+          echo "Quality Gate Status: $qualityGateStatus"
+
+          if [[ "$qualityGateStatus" != "OK" ]]; then
+            echo "❌ Quality Gate failed."
+            exit 1
+          else
+            echo "✅ Quality Gate passed."
+          fi
