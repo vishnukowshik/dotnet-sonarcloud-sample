@@ -1,8 +1,9 @@
 name: SonarCloud Analysis (.NET)
-
+# Trigger Manually 
 on:
   workflow_dispatch:  # Triggered manually from GitHub Actions tab
 
+# Job name to build 
 jobs:
   build:
     name: Build and Analyze
@@ -11,7 +12,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+# Install dotnet and next create solution file 
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
@@ -26,7 +27,7 @@ jobs:
       - name: Run tests with coverage
         run: |
          dotnet test DotnetApp.Tests/DotnetApp.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
-
+# Connect to sonarcloud using the project key ,org and using sonar token which is for auththorixation
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
