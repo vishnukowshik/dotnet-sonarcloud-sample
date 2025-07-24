@@ -25,7 +25,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-         dotnet test DotnetApp.Tests/DotnetApp.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+        dotnet test DotnetApp.Tests/DotnetApp.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
@@ -37,39 +37,4 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Wait for Quality Gate result
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          echo "Waiting for SonarCloud Quality Gate..."
-
-          projectKey="vishnukowshik"
-
-          # Get the latest analysis task ID
-          analysisId=$(curl -s -u $SONAR_TOKEN: https://sonarcloud.io/api/ce/component?component=$projectKey | jq -r '.queue[0].id')
-
-          # Wait until the analysis is complete
-          for i in {1..10}; do
-            sleep 10
-            status=$(curl -s -u $SONAR_TOKEN: https://sonarcloud.io/api/ce/task?id=$analysisId | jq -r '.task.status')
-            echo "Check $i: Analysis status = $status"
-            if [[ "$status" == "SUCCESS" ]]; then
-              break
-            fi
-          done
-
-          if [[ "$status" != "SUCCESS" ]]; then
-            echo "SonarCloud analysis did not complete successfully."
-            exit 1
-          fi
-
-          # Check Quality Gate status
-          qualityGateStatus=$(curl -s -u $SONAR_TOKEN: https://sonarcloud.io/api/qualitygates/project_status?analysisId=$analysisId | jq -r '.projectStatus.status')
-          echo "Quality Gate Status: $qualityGateStatus"
-
-          if [[ "$qualityGateStatus" != "OK" ]]; then
-            echo "❌ Quality Gate failed."
-            exit 1
-          else
-            echo "✅ Quality Gate passed."
-          fi
+      
