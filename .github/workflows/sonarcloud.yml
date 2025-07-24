@@ -38,8 +38,8 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=your-sonarcloud-project-key
-            -Dsonar.organization=your-org
+            -Dsonar.projectKey=vishnukowshik
+            -Dsonar.organization=vishnukowshik
             -Dsonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
