@@ -2,11 +2,6 @@ name: SonarCloud Analysis (.NET)
 
 on:
   workflow_dispatch:
-    inputs:
-      target_branch:
-        description: 'Branch to run analysis on'
-        required: true
-        default: 'feature/dotnet-sonarcloud-sample'
 
 jobs:
   build:
@@ -16,8 +11,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.target_branch }}
 
       - name: Setup .NET 6
         uses: actions/setup-dotnet@v4
@@ -43,3 +36,4 @@ jobs:
             -Dsonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
