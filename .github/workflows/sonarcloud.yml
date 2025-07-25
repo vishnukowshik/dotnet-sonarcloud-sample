@@ -50,7 +50,7 @@ jobs:
      #   uses: actions/setup-dotnet@v4
      #   with:
       #    dotnet-version: '8.0.x'
-   # sonar cloudscan    
+   # sonar cloudscan along with Project Path and organization which are mandatory values 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
